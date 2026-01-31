@@ -105,102 +105,53 @@ local goal = {Position = UDim2.new(0.5, -160, 0, 10)}
 local tween = tweenService:Create(frame, tweenInfo, goal)
 tween:Play()
 
--- 4: Menu Cài đặt (Animation ẩn/hiện)
-local menu = Instance.new("Frame")
-menu.Parent = gui
-menu.Size = UDim2.new(0, 200, 0, 0) -- Bắt đầu bằng 0 để chạy animation
-menu.Position = UDim2.new(0.5, -100, 0.3, 0)
-menu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-menu.BorderSizePixel = 0
-menu.ClipsDescendants = true
-menu.Visible = false
+-- MENU CÀI ĐẶT
+local settingsMenu = Instance.new("Frame")
+settingsMenu.Parent = gui
+settingsMenu.Size = UDim2.new(0, 150, 0, 80)
+settingsMenu.Position = UDim2.new(0.5, -75, 0, 115)
+settingsMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+settingsMenu.Visible = false
+settingsMenu.BorderSizePixel = 0
+settingsMenu.BackgroundTransparency = 0.1
 
-local menuCorner = Instance.new("UICorner")
-menuCorner.Parent = menu
+local settingsCorner = Instance.new("UICorner")
+settingsCorner.CornerRadius = UDim.new(0, 6)
+settingsCorner.Parent = settingsMenu
 
-local layout = Instance.new("UIListLayout")
-layout.Parent = menu
-layout.Padding = UDim.new(0, 8)
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.SortOrder = Enum.SortOrder.LayoutOrder
+-- Tùy chọn 1: Bật/Tắt âm thanh
+local soundToggle = Instance.new("TextButton")
+soundToggle.Parent = settingsMenu
+soundToggle.Size = UDim2.new(1, -10, 0, 30)
+soundToggle.Position = UDim2.new(0, 5, 0, 5)
+soundToggle.Text = "🔊 Âm thanh: Bật"
+soundToggle.TextScaled = true
+soundToggle.Font = Enum.Font.SourceSans
+soundToggle.TextColor3 = Color3.new(1, 1, 1)
+soundToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 
--- 5: Phần 1 - Nhập đơn hàng
-local btnNhap = Instance.new("TextButton")
-btnNhap.Parent = menu
-btnNhap.Size = UDim2.new(0.9, 0, 0, 35)
-btnNhap.Text = "Nhập tên đơn hàng"
-btnNhap.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-btnNhap.TextColor3 = Color3.new(1, 1, 1)
-btnNhap.Font = Enum.Font.SourceSansBold
-
-local boxNhap = Instance.new("TextBox")
-boxNhap.Parent = menu
-boxNhap.Size = UDim2.new(0.9, 0, 0, 30)
-boxNhap.PlaceholderText = "Gõ tên vào đây..."
-boxNhap.Visible = false
-boxNhap.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-boxNhap.TextColor3 = Color3.new(1, 1, 1)
-
-btnNhap.MouseButton1Click:Connect(function()
-    boxNhap.Visible = not boxNhap.Visible
+local isSoundOn = true
+soundToggle.MouseButton1Click:Connect(function()
+    isSoundOn = not isSoundOn
+    soundToggle.Text = isSoundOn and "🔊 Âm thanh: Bật" or "🔇 Âm thanh: Tắt"
 end)
 
-boxNhap.FocusLost:Connect(function(enter)
-    if enter then
-        tenDon = boxNhap.Text
-        title.Text = "Đơn: " .. tenDon
-    end
+-- Tùy chọn 2: Đổi màu nền GUI
+local bgToggle = Instance.new("TextButton")
+bgToggle.Parent = settingsMenu
+bgToggle.Size = UDim2.new(1, -10, 0, 30)
+bgToggle.Position = UDim2.new(0, 5, 0, 40)
+bgToggle.Text = "🎨 Đổi màu nền"
+bgToggle.TextScaled = true
+bgToggle.Font = Enum.Font.SourceSans
+bgToggle.TextColor3 = Color3.new(1, 1, 1)
+bgToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+bgToggle.MouseButton1Click:Connect(function()
+    frame.BackgroundColor3 = Color3.fromRGB(math.random(30, 255), math.random(30, 255), math.random(30, 255))
 end)
 
--- 5: Phần 2 - Fix Lag 60%
-local btnFixLag = Instance.new("TextButton")
-btnFixLag.Parent = menu
-btnFixLag.Size = UDim2.new(0.9, 0, 0, 35)
-btnFixLag.Text = "Fix Lag (60% Graphics)"
-btnFixLag.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-btnFixLag.TextColor3 = Color3.new(1, 1, 1)
-btnFixLag.Font = Enum.Font.SourceSansBold
-
-btnFixLag.MouseButton1Click:Connect(function()
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("PostProcessEffect") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
-            v.Enabled = false
-        end
-    end
-    btnFixLag.Text = "Đã Fix Lag!"
+-- Bật/tắt menu khi nhấn icon bánh răng
+gearClick.MouseButton1Click:Connect(function()
+    settingsMenu.Visible = not settingsMenu.Visible
 end)
-
--- Animation cho Menu
-local ts = game:GetService("TweenService")
-gearIcon.MouseButton1Click:Connect(function()
-    if not menu.Visible then
-        menu.Visible = true
-        ts:Create(gearIcon, TweenInfo.new(0.3), {Rotation = 90}):Play()
-        ts:Create(menu, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Size = UDim2.new(0, 200, 0, 130)}):Play()
-    else
-        ts:Create(gearIcon, TweenInfo.new(0.3), {Rotation = 0}):Play()
-        local tw = ts:Create(menu, TweenInfo.new(0.3), {Size = UDim2.new(0, 200, 0, 0)})
-        tw:Play()
-        tw.Completed:Connect(function() menu.Visible = false end)
-    end
-end)
-
--- 6: Anti-Ban/Anti-Cheat siêu mạnh cho Delta
-local function SecureAntiBan()
-    local mt = getrawmetatable(game)
-    local old = mt.__namecall
-    setreadonly(mt, false)
-    
-    mt.__namecall = newcclosure(function(self, ...)
-        local method = getnamecallmethod()
-        if method == "Kick" or method == "kick" then 
-            return nil 
-        end
-        return old(self, ...)
-    end)
-    setreadonly(mt, true)
-end
-pcall(SecureAntiBan)
-
-print("Script đã chạy thành công!")
